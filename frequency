@@ -1,0 +1,62 @@
+import sys
+import json
+import operator
+
+
+def lines(fp):
+    print str(len(fp.readlines()))
+
+tweet_file = open("/Users/tianjiachen/datasci_course_materials/assignment1/problem_2_submission.txt")
+
+# calculate sentiment score for each twitter.
+
+trans2 = tweet_file.readlines()
+sum_terms = 0
+voca_terms = []
+
+for i in range(len(trans2)):
+    result = json.loads(trans2[i])
+    if result.has_key("text"):
+        content = result['text']
+        content_sep = content.split()
+        sum_terms +=len(content_sep)
+        for j in range(len(content_sep)):
+            if content_sep[j] in voca_terms:
+                pass
+            else:
+                voca_terms.append(content_sep[j])
+
+voca_terms_num = []
+voca_terms_freq = []
+
+for i in range(len(voca_terms)):
+    word = voca_terms[i]
+    num = 0
+    for j in range(len(trans2)):
+        result = json.loads(trans2[j])
+        if result.has_key("text"):
+            content = result['text']
+            content_sep = content.split()
+            if word in content_sep:
+                num +=1
+    voca_terms_num.append(num)
+
+
+for i in range(len(voca_terms_num)):
+    voca_terms_freq.append(round(float(voca_terms_num[i])/float(sum_terms),3))
+    
+voca_freq = {}
+
+for i in range(len(voca_terms)):
+    voca_freq[voca_terms[i]] = voca_terms_freq[i]
+
+order_freq = sorted(voca_freq.items(), key = operator.itemgetter(1), reverse = True)
+print order_freq[1:20]
+
+
+
+
+
+
+            
+            
