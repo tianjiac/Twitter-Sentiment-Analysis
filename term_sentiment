@@ -1,0 +1,111 @@
+import sys
+import json
+
+
+def lines(fp):
+    print str(len(fp.readlines()))
+
+
+
+
+sent_file = open("/Users/tianjiachen/datasci_course_materials/assignment1/AFINN-111.txt")
+tweet_file = open("/Users/tianjiachen/datasci_course_materials/assignment1/problem_2_submission.txt")
+
+
+# Create the dictionary for sent_file
+
+sent_dic = {}
+
+trans1 = sent_file.readlines()
+for i in range(len(trans1)):
+    trans1[i] = trans1[i].rstrip()
+    result = trans1[i].split('\t',-1)
+    trans_dic = {}
+    trans_dic[result[0]] = result[1]
+    sent_dic.update(trans_dic)
+
+
+score_sample = []
+sent_sample=[]
+has_score = []
+
+# calculate sentiment score for each twitter.
+
+trans2 = tweet_file.readlines()
+for i in range(len(trans2)):
+    score = 0
+    result = json.loads(trans2[i])
+    if result.has_key("text"):
+        content = result['text']
+        content_sep = content.split()
+        for j in range(len(content_sep)):
+            for k in range(len(sent_dic)):
+                if content_sep[j] == sent_dic.keys()[k]:
+                    print sent_dic.keys()[k]
+                    print i
+                    score +=float(sent_dic[sent_dic.keys()[k]])
+        print score
+    if score: # Save Twitters and scores with positive or negative sentiments.
+        sent_sample.append(content_sep)
+        has_score.append(score)
+        
+    score_sample.append(score)
+
+
+
+
+# Create new vocabulary from words in sentiment twitters.
+
+new_vocabulary = []
+
+for i in range(len(sent_sample)):
+    analysis = sent_sample[i] # Each Twitter
+    for j in range(len(analysis)):
+        if any(analysis[j] in s for s in new_vocabulary):
+            print "'" + analysis[j] + "'" + " already exists in new vocabulary!"
+        else:
+            new_vocabulary.append(analysis[j])
+
+
+new_vocabulary_score = []
+
+for i in range(len(new_vocabulary)):
+    word = new_vocabulary[i]  # Each new word
+    pos_score = 0
+    pos_sum = 0
+    neg_score = 0
+    neg_sum = 0
+    for j in range(len(sent_sample)):
+        if any(word in s for s in sent_sample[j]):
+            if float(has_score[j]) > 0:
+                pos_score +=1
+                pos_sum +=float(has_score[j])
+            else:
+                neg_score +=1
+                neg_sum +=float(has_score[j])
+    if pos_score > neg_score:
+        new_vocabulary_score.append(float(pos_sum)/float(pos_score))
+    else:
+        new_vocabulary_score.append(float(neg_sum)/float(neg_score))
+
+
+new_voca = {}
+
+for i in range(len(new_vocabulary)):
+    new_voca[new_vocabulary[i]] = new_vocabulary_score[i]
+
+print new_voca
+
+
+        
+            
+    
+    
+
+
+        
+        
+
+
+
+
